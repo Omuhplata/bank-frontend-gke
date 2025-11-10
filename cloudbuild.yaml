@@ -1,0 +1,31 @@
+substitutions:
+  _REGION: "us-east4"
+  _AR_REPO: "omar-bank-gke-repo"
+  _SERVICE: "bank-web-gke"
+  _API_BASE_URL: "http://34.48.104.147/api/v1"
+  _TAG: "latest"
+  _DOCKERFILE: "Dockerfile-before-https-first"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-f","${_DOCKERFILE}",
+        "--build-arg","REACT_APP_API_URL=${_API_BASE_URL}",
+        "-t","${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_TAG}",
+        "."
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "push",
+        "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_TAG}"
+      ]
+
+images:
+  - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_TAG}"
